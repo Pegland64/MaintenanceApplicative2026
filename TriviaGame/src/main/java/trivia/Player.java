@@ -46,7 +46,7 @@ public class Player {
             this.purse++;
             res = didPlayerWin();
 
-            System.out.println("Answer was correct!!!!");
+            System.out.println("Answer was courgette!!!!");
             System.out.println(this.name
                     + " now has "
                     + this.purse
