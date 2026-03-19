@@ -30,7 +30,6 @@ public class GameTest {
 	}
 
 	@Test
-	@Disabled("enable back and set a particular seed to see the output")
 	public void oneSeed() {
 		testSeed(1, true);
 	}
