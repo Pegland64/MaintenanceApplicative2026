@@ -3,6 +3,7 @@ package main;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CalendarManager {
     public List<Event> events;
@@ -17,33 +18,28 @@ public class CalendarManager {
         events.add(e);
     }
 
+    public ResultatSuppression supprimerParId(EventId id) {
+        int avant = events.size();
+        events.removeIf(e -> e.id().equals(id));
+        int apres = events.size();
+
+        // pas de ternaire: on indexe une liste sur le résultat boolean
+        List<ResultatSuppression> choix = List.of(ResultatSuppression.introuvable(), ResultatSuppression.supprime());
+        return choix.get(apres < avant ? 1 : 0);
+    }
+
     public List<Event> eventsDansPeriode(LocalDateTime debut, LocalDateTime fin) {
         DateHeureEvenement d = new DateHeureEvenement(debut);
         DateHeureEvenement f = new DateHeureEvenement(fin);
 
-        List<Event> result = new ArrayList<>();
-        for (Event e : events) {
-            if (e.type.estPeriodique()) {
-                LocalDateTime temp = e.creneau.debut().asLocalDateTime();
-                while (temp.isBefore(fin)) {
-                    if (!temp.isBefore(debut)) {
-                        result.add(e);
-                        break;
-                    }
-                    temp = temp.plusDays(e.frequence.enJours());
-                }
-            } else if (e.creneau.estDans(d, f)) {
-                result.add(e);
-            }
-        }
-        return result;
+        // pas de if: filtre stream
+        return events.stream()
+                .filter(e -> e.estDansPeriode(d, f))
+                .collect(Collectors.toList());
     }
 
     public boolean conflit(Event e1, Event e2) {
-        if (e1.type.estPeriodique() || e2.type.estPeriodique()) {
-            return false; // simplification actuelle
-        }
-        return e1.creneau.chevauche(e2.creneau);
+        return e1.conflitAvec(e2);
     }
 
     public void afficherEvenements() {

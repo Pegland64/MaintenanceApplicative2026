@@ -22,8 +22,8 @@ class CalendarManagerTest {
         List<Event> result = calendar.eventsDansPeriode(debut, fin);
 
         assertEquals(2, result.size());
-        assertEquals("PileDebut", result.get(0).title.asString());
-        assertEquals("PileFin", result.get(1).title.asString());
+        assertEquals("PileDebut", result.get(0).title().asString());
+        assertEquals("PileFin", result.get(1).title().asString());
     }
 
     @Test
@@ -62,8 +62,8 @@ class CalendarManagerTest {
         List<Event> result = calendar.eventsDansPeriode(debut, fin);
 
         assertEquals(1, result.size());
-        assertEquals("PERIODIQUE", result.get(0).type.asString()); // fix
-        assertEquals("Sport", result.get(0).title.asString());
+        assertEquals("PERIODIQUE", result.get(0).type().asString());
+        assertEquals("Sport", result.get(0).title().asString());
     }
 
     @Test
@@ -233,8 +233,8 @@ class CalendarManagerTest {
     }
 
     @Test
-    void description_type_inconnu_retourne_chaine_vide() {
-        Event inconnu = new Event(
+    void description_type_inconnu_leve_une_exception() {
+        assertThrows(NullPointerException.class, () -> new Event(
                 "AUTRE",
                 new TitreEvenement("X"),
                 "Alice",
@@ -243,8 +243,6 @@ class CalendarManagerTest {
                 "",
                 "",
                 0
-        );
-
-        assertEquals("", inconnu.description());
+        ));
     }
 }
