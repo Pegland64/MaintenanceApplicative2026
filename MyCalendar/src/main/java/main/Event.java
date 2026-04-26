@@ -3,35 +3,40 @@ package main;
 import java.time.LocalDateTime;
 
 public class Event {
-    public String type; // "RDV_PERSONNEL", "REUNION", "PERIODIQUE"
-    public String title;
-    public String proprietaire;
-    public LocalDateTime dateDebut;
-    public int dureeMinutes;
-    public String lieu; // utilisé seulement pour REUNION
-    public String participants; // séparés par virgules (pour REUNION uniquement)
-    public int frequenceJours; // uniquement pour PERIODIQUE
+    public EventId id;
+    public TypeEvenement type;
+    public TitreEvenement title;
+    public Proprietaire proprietaire;
 
-    public Event(String type, String title, String proprietaire, LocalDateTime dateDebut, int dureeMinutes,
+    public Creneau creneau;
+
+    public Lieu lieu; // REUNION
+    public Participants participants; // REUNION
+    public FrequenceJours frequence; // PERIODIQUE
+
+    // Constructeur "bordure" conservé pour limiter la casse (Main/tests)
+    public Event(String type, TitreEvenement title, String proprietaire, LocalDateTime dateDebut, int dureeMinutes,
                  String lieu, String participants, int frequenceJours) {
-        this.type = type;
+        this.id = EventId.newId();
+        this.type = TypeEvenement.of(type);
         this.title = title;
-        this.proprietaire = proprietaire;
-        this.dateDebut = dateDebut;
-        this.dureeMinutes = dureeMinutes;
-        this.lieu = lieu;
-        this.participants = participants;
-        this.frequenceJours = frequenceJours;
+        this.proprietaire = new Proprietaire(proprietaire);
+
+        this.creneau = new Creneau(new DateHeureEvenement(dateDebut), new DureeEvenement(dureeMinutes));
+
+        this.lieu = (lieu == null) ? Lieu.vide() : new Lieu(lieu);
+        this.participants = Participants.fromCsv(participants);
+        this.frequence = new FrequenceJours(frequenceJours);
     }
 
     public String description() {
         String desc = "";
-        if (type.equals("RDV_PERSONNEL")) {
-            desc = "RDV : " + title + " à " + dateDebut.toString();
-        } else if (type.equals("REUNION")) {
-            desc = "Réunion : " + title + " à " + lieu + " avec " + participants;
-        } else if (type.equals("PERIODIQUE")) {
-            desc = "Événement périodique : " + title + " tous les " + frequenceJours + " jours";
+        if (type.estRdvPersonnel()) {
+            desc = "RDV : " + title.asString() + " à " + creneau.debut().asLocalDateTime().toString();
+        } else if (type.estReunion()) {
+            desc = "Réunion : " + title.asString() + " à " + lieu.asString() + " avec " + participants.asCsv();
+        } else if (type.estPeriodique()) {
+            desc = "Événement périodique : " + title.asString() + " tous les " + frequence.enJours() + " jours";
         }
         return desc;
     }
