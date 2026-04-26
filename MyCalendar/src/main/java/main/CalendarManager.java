@@ -14,7 +14,15 @@ public class CalendarManager {
 
     public void ajouterEvent(String type, String title, String proprietaire, LocalDateTime dateDebut, int dureeMinutes,
                              String lieu, String participants, int frequenceJours) {
-        Event e = new Event(type, new TitreEvenement(title), proprietaire, dateDebut, dureeMinutes, lieu, participants, frequenceJours);
+        Event e = Event.withNewId(
+                TypeEvenement.of(type),
+                new TitreEvenement(title),
+                new Proprietaire(proprietaire),
+                new Creneau(new DateHeureEvenement(dateDebut), new DureeEvenement(dureeMinutes)),
+                new Lieu(lieu),
+                Participants.fromCsv(participants),
+                new FrequenceJours(frequenceJours)
+        );
         events.add(e);
     }
 
@@ -23,16 +31,16 @@ public class CalendarManager {
         events.removeIf(e -> e.id().equals(id));
         int apres = events.size();
 
-        // pas de ternaire: on indexe une liste sur le résultat boolean
         List<ResultatSuppression> choix = List.of(ResultatSuppression.introuvable(), ResultatSuppression.supprime());
-        return choix.get(apres < avant ? 1 : 0);
+        int index = Math.max(0, Integer.compare(avant, apres));
+        return choix.get(index);
     }
+
 
     public List<Event> eventsDansPeriode(LocalDateTime debut, LocalDateTime fin) {
         DateHeureEvenement d = new DateHeureEvenement(debut);
         DateHeureEvenement f = new DateHeureEvenement(fin);
 
-        // pas de if: filtre stream
         return events.stream()
                 .filter(e -> e.estDansPeriode(d, f))
                 .collect(Collectors.toList());

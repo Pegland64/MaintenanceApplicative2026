@@ -93,26 +93,24 @@ class CalendarManagerTest {
     void conflit_retourne_faux_si_un_des_events_est_periodique() {
         CalendarManager calendar = new CalendarManager();
 
-        Event periodique = new Event(
-                "PERIODIQUE",
+        Event periodique = Event.withNewId(
+                TypeEvenement.of("PERIODIQUE"),
                 new TitreEvenement("P"),
-                "Alice",
-                LocalDateTime.of(2026, 1, 10, 10, 0),
-                0,
-                "",
-                "",
-                3
+                new Proprietaire("Alice"),
+                new Creneau(new DateHeureEvenement(LocalDateTime.of(2026, 1, 10, 10, 0)), new DureeEvenement(0)),
+                new Lieu(""),
+                Participants.fromCsv(""),
+                new FrequenceJours(3)
         );
 
-        Event rdv = new Event(
-                "RDV_PERSONNEL",
+        Event rdv = Event.withNewId(
+                TypeEvenement.of("RDV_PERSONNEL"),
                 new TitreEvenement("R"),
-                "Bob",
-                LocalDateTime.of(2026, 1, 10, 10, 0),
-                60,
-                "",
-                "",
-                0
+                new Proprietaire("Bob"),
+                new Creneau(new DateHeureEvenement(LocalDateTime.of(2026, 1, 10, 10, 0)), new DureeEvenement(60)),
+                new Lieu(""),
+                Participants.fromCsv(""),
+                new FrequenceJours(0)
         );
 
         assertFalse(calendar.conflit(periodique, rdv));
@@ -123,26 +121,24 @@ class CalendarManagerTest {
     void conflit_retourne_vrai_si_chevauchement() {
         CalendarManager calendar = new CalendarManager();
 
-        Event e1 = new Event(
-                "RDV_PERSONNEL",
+        Event e1 = Event.withNewId(
+                TypeEvenement.of("RDV_PERSONNEL"),
                 new TitreEvenement("E1"),
-                "Alice",
-                LocalDateTime.of(2026, 1, 10, 10, 0),
-                60,
-                "",
-                "",
-                0
+                new Proprietaire("Alice"),
+                new Creneau(new DateHeureEvenement(LocalDateTime.of(2026, 1, 10, 10, 0)), new DureeEvenement(60)),
+                new Lieu(""),
+                Participants.fromCsv(""),
+                new FrequenceJours(0)
         );
 
-        Event e2 = new Event(
-                "RDV_PERSONNEL",
+        Event e2 = Event.withNewId(
+                TypeEvenement.of("RDV_PERSONNEL"),
                 new TitreEvenement("E2"),
-                "Bob",
-                LocalDateTime.of(2026, 1, 10, 10, 30),
-                30,
-                "",
-                "",
-                0
+                new Proprietaire("Bob"),
+                new Creneau(new DateHeureEvenement(LocalDateTime.of(2026, 1, 10, 10, 30)), new DureeEvenement(30)),
+                new Lieu(""),
+                Participants.fromCsv(""),
+                new FrequenceJours(0)
         );
 
         assertTrue(calendar.conflit(e1, e2));
@@ -152,26 +148,24 @@ class CalendarManagerTest {
     void conflit_retourne_faux_si_pas_chevauchement_bord_a_bord() {
         CalendarManager calendar = new CalendarManager();
 
-        Event e1 = new Event(
-                "RDV_PERSONNEL",
+        Event e1 = Event.withNewId(
+                TypeEvenement.of("RDV_PERSONNEL"),
                 new TitreEvenement("E1"),
-                "Alice",
-                LocalDateTime.of(2026, 1, 10, 10, 0),
-                30,
-                "",
-                "",
-                0
+                new Proprietaire("Alice"),
+                new Creneau(new DateHeureEvenement(LocalDateTime.of(2026, 1, 10, 10, 0)), new DureeEvenement(30)),
+                new Lieu(""),
+                Participants.fromCsv(""),
+                new FrequenceJours(0)
         );
 
-        Event e2 = new Event(
-                "RDV_PERSONNEL",
+        Event e2 = Event.withNewId(
+                TypeEvenement.of("RDV_PERSONNEL"),
                 new TitreEvenement("E2"),
-                "Bob",
-                LocalDateTime.of(2026, 1, 10, 10, 30),
-                30,
-                "",
-                "",
-                0
+                new Proprietaire("Bob"),
+                new Creneau(new DateHeureEvenement(LocalDateTime.of(2026, 1, 10, 10, 30)), new DureeEvenement(30)),
+                new Lieu(""),
+                Participants.fromCsv(""),
+                new FrequenceJours(0)
         );
 
         assertFalse(calendar.conflit(e1, e2));
@@ -179,15 +173,14 @@ class CalendarManagerTest {
 
     @Test
     void description_rdv_personnel() {
-        Event rdv = new Event(
-                "RDV_PERSONNEL",
+        Event rdv = Event.withNewId(
+                TypeEvenement.of("RDV_PERSONNEL"),
                 new TitreEvenement("Dentiste"),
-                "Alice",
-                LocalDateTime.of(2026, 1, 10, 10, 0),
-                30,
-                "",
-                "",
-                0
+                new Proprietaire("Alice"),
+                new Creneau(new DateHeureEvenement(LocalDateTime.of(2026, 1, 10, 10, 0)), new DureeEvenement(30)),
+                new Lieu(""),
+                Participants.fromCsv(""),
+                new FrequenceJours(0)
         );
 
         String desc = rdv.description();
@@ -198,15 +191,14 @@ class CalendarManagerTest {
 
     @Test
     void description_reunion() {
-        Event reunion = new Event(
-                "REUNION",
+        Event reunion = Event.withNewId(
+                TypeEvenement.of("REUNION"),
                 new TitreEvenement("Sprint"),
-                "Alice",
-                LocalDateTime.of(2026, 1, 10, 11, 0),
-                60,
-                "Salle A",
-                "Alice, Bob",
-                0
+                new Proprietaire("Alice"),
+                new Creneau(new DateHeureEvenement(LocalDateTime.of(2026, 1, 10, 11, 0)), new DureeEvenement(60)),
+                new Lieu("Salle A"),
+                Participants.fromCsv("Alice, Bob"),
+                new FrequenceJours(0)
         );
 
         String desc = reunion.description();
@@ -216,15 +208,14 @@ class CalendarManagerTest {
 
     @Test
     void description_periodique() {
-        Event periodique = new Event(
-                "PERIODIQUE",
+        Event periodique = Event.withNewId(
+                TypeEvenement.of("PERIODIQUE"),
                 new TitreEvenement("Sport"),
-                "Alice",
-                LocalDateTime.of(2026, 1, 1, 10, 0),
-                0,
-                "",
-                "",
-                3
+                new Proprietaire("Alice"),
+                new Creneau(new DateHeureEvenement(LocalDateTime.of(2026, 1, 1, 10, 0)), new DureeEvenement(0)),
+                new Lieu(""),
+                Participants.fromCsv(""),
+                new FrequenceJours(3)
         );
 
         String desc = periodique.description();
@@ -234,15 +225,14 @@ class CalendarManagerTest {
 
     @Test
     void description_type_inconnu_leve_une_exception() {
-        assertThrows(NullPointerException.class, () -> new Event(
-                "AUTRE",
+        assertThrows(NullPointerException.class, () -> Event.withNewId(
+                TypeEvenement.of("AUTRE"),
                 new TitreEvenement("X"),
-                "Alice",
-                LocalDateTime.of(2026, 1, 1, 10, 0),
-                0,
-                "",
-                "",
-                0
+                new Proprietaire("Alice"),
+                new Creneau(new DateHeureEvenement(LocalDateTime.of(2026, 1, 1, 10, 0)), new DureeEvenement(0)),
+                new Lieu(""),
+                Participants.fromCsv(""),
+                new FrequenceJours(0)
         ));
     }
 }
